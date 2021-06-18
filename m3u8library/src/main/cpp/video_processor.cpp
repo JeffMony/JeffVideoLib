@@ -83,6 +83,8 @@ Java_com_jeffmony_m3u8library_VideoProcessor_transformVideo(JNIEnv *env, jobject
     int stream_mapping_size;
     int width = 0, height = 0;
     int64_t last_dts = 0;
+    int64_t first_pts_dts = 0;
+    int first_pkt = 0;
     int64_t total_packets_count, temp_packets_count = 0;
     float current_progress, last_progress = -1;
 
@@ -245,6 +247,15 @@ Java_com_jeffmony_m3u8library_VideoProcessor_transformVideo(JNIEnv *env, jobject
         if (pkt.pts < pkt.dts) {
             pkt.pts = pkt.dts;
         }
+
+        //起始的时间归0
+        if (!first_pkt && pkt.flags & AV_PKT_FLAG_KEY) {
+            first_pts_dts = pkt.pts;
+            first_pkt++;
+        }
+
+        pkt.pts = pkt.pts - first_pts_dts;
+        pkt.dts = pkt.dts - first_pts_dts;
 
         /* copy packet */
         pkt.pts = av_rescale_q_rnd(pkt.pts, in_stream->time_base, out_stream->time_base,
