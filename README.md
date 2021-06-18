@@ -9,3 +9,32 @@ M3U8视频合并为MP4视频专用库,已经尽量裁减优化,减少包大小,�
 > * 去掉不用的模块和格式
 > * 解决合成过程中的异常问题,主要是pts和dts的异常问题
 
+```
+--disable-gpl \
+--disable-doc \
+--disable-static \
+--disable-x86asm \
+--disable-asm \
+--disable-symver \
+--disable-devices \
+--disable-avdevice \
+--disable-postproc \
+--disable-avfilter \
+--disable-avresample \
+--disable-ffmpeg \
+--disable-ffplay \
+--disable-ffprobe \
+--disable-programs \
+--disable-encoders \
+--disable-decoders \
+--enable-decoder=h264 \
+--enable-decoder=aac \
+--enable-decoder=mp3 \
+--disable-muxers \
+--enable-muxer=mp4 \
+--disable-demuxers \
+--enable-demuxer=hls \
+--enable-demuxer=mov \
+--enable-demuxer=mpegts \
+```
+
