@@ -7,12 +7,12 @@ public class VideoProcessor {
     public static void loadLibrariesOnce() {
         synchronized (VideoProcessor.class) {
             if (!mIsLibLoaded) {
+                System.loadLibrary("jeffmony");
                 System.loadLibrary("avcodec");
                 System.loadLibrary("avformat");
                 System.loadLibrary("avutil");
                 System.loadLibrary("swresample");
                 System.loadLibrary("swscale");
-                System.loadLibrary("jeffmony");
 
                 mIsLibLoaded = true;
 
