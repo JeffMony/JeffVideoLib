@@ -57,7 +57,8 @@ dependencies {
 ```
 
 #### 如何调用这个SDK
-
+传入的M3U8路径需要是本地文件路径，如何下载这个M3U8文件，可以参考开源项目：<br>
+[https://github.com/JeffMony/VideoDownloader](https://github.com/JeffMony/VideoDownloader)
 ```
 VideoProcessManager.getInstance().transformM3U8ToMp4(final String inputFilePath, final String outputFilePath, @NonNull final IVideoTransformListener listener)
 
