@@ -39,3 +39,35 @@ M3U8视频合并为MP4视频专用库,已经尽量裁减优化,减少包大小,�
 --enable-demuxer=mpegts \
 ```
 
+#### 如何接入这个SDK
+目前最新的版本号是1.0.0，如果需要在自己项目中集成，需要做好特定的依赖。<br>
+在build.gradle中引入
+```
+allprojects {
+    repositories {
+	    maven { url 'https://jitpack.io' }
+	}
+}
+```
+在你的app中直接引用
+```
+dependencies {
+    implementation 'com.github.JeffMony:JeffM3U8Lib:1.0.0'
+}
+```
+
+#### 如何调用这个SDK
+
+```
+VideoProcessManager.getInstance().transformM3U8ToMp4(final String inputFilePath, final String outputFilePath, @NonNull final IVideoTransformListener listener)
+
+
+public interface IVideoTransformListener {
+
+    void onTransformProgress(float progress);
+
+    void onTransformFailed(Exception e);
+
+    void onTransformFinished();
+}
+```
