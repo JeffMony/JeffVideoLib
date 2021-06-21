@@ -40,7 +40,7 @@ M3U8视频合并为MP4视频专用库,已经尽量裁减优化,减少包大小,�
 ```
 
 #### 如何接入这个SDK
-目前最新的版本号是1.0.0，如果需要在自己项目中集成，需要做好特定的依赖。<br>
+目前最新的版本号是1.1.0，如果需要在自己项目中集成，需要做好特定的依赖。<br>
 在build.gradle中引入
 ```
 allprojects {
@@ -52,7 +52,7 @@ allprojects {
 在你的app中直接引用
 ```
 dependencies {
-    implementation 'com.github.JeffMony:JeffM3U8Lib:1.0.0'
+    implementation 'com.github.JeffMony:JeffM3U8Lib:1.1.0'
 }
 ```
 
