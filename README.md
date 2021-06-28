@@ -8,6 +8,7 @@ M3U8视频合并为MP4视频专用库,已经尽量裁减优化,减少包大小,�
 > * 明确M3U8合成MP4所需要支持的格式
 > * 去掉不用的模块和格式
 > * 解决合成过程中的异常问题,主要是pts和dts的异常问题
+> * 一些不用的protocols或者decoder可以disable掉
 
 具体参考[https://github.com/JeffMony/AndroidFFmpegCompile](https://github.com/JeffMony/AndroidFFmpegCompile)工程
 ```
@@ -29,6 +30,7 @@ M3U8视频合并为MP4视频专用库,已经尽量裁减优化,减少包大小,�
 --disable-encoders \
 --disable-decoders \
 --enable-decoder=h264 \
+--enable-decoder=hevc \
 --enable-decoder=aac \
 --enable-decoder=mp3 \
 --disable-muxers \
@@ -37,6 +39,20 @@ M3U8视频合并为MP4视频专用库,已经尽量裁减优化,减少包大小,�
 --enable-demuxer=hls \
 --enable-demuxer=mov \
 --enable-demuxer=mpegts \
+--disable-parsers \
+--enable-parser=aac \
+--enable-parser=aac_latm \
+--enable-parser=ac3 \
+--enable-parser=h264 \
+--enable-parser=hevc \
+--disable-protocols \
+--enable-protocol=http \
+--enable-protocol=https \
+--enable-protocol=crypto \
+--enable-protocol=file \
+--enable-protocol=hls \
+--enable-protocol=tls \
+--enable-protocol=tcp \
 ```
 
 #### 如何接入这个SDK
