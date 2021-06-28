@@ -68,7 +68,7 @@ allprojects {
 在你的app中直接引用
 ```
 dependencies {
-    implementation 'com.github.JeffMony:JeffM3U8Lib:1.1.0'
+    implementation 'com.github.JeffMony:JeffM3U8Lib:1.2.0'
 }
 ```
 
