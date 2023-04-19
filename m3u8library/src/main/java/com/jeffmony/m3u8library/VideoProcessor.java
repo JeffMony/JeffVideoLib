@@ -13,7 +13,7 @@ public class VideoProcessor {
     public static void loadLibrariesOnce() {
         synchronized (VideoProcessor.class) {
             if (!mIsLibLoaded) {
-                System.loadLibrary("jeffmony");
+                System.loadLibrary("media_muxer");
                 System.loadLibrary("avcodec");
                 System.loadLibrary("avformat");
                 System.loadLibrary("avutil");

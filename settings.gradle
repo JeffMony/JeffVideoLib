@@ -1,3 +1,3 @@
 include ':m3u8library'
 include ':app'
-rootProject.name = "m3u8test"
+rootProject.name = "JeffM3U8Lib"

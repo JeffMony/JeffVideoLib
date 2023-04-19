@@ -3,6 +3,7 @@ package com.jeffmony.m3u8test;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.Manifest;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.github.florent37.runtimepermission.RuntimePermission;
 import com.jeffmony.m3u8library.VideoProcessManager;
 import com.jeffmony.m3u8library.listener.IVideoTransformListener;
 import com.jeffmony.m3u8library.utils.LogUtils;
@@ -30,7 +32,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        RuntimePermission.askPermission(this)
+                .request(Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .onAccepted((result -> {
+                    /**
+                     * 权限已经申请成功
+                     */
+                })).ask();
         initViews();
     }
 
