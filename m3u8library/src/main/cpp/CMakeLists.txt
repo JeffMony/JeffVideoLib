@@ -5,25 +5,29 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
-## libavcodec.so
-add_library(libavcodec SHARED IMPORTED)
-set_target_properties(libavcodec PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/../jniLibs/${ANDROID_ABI}/libavcodec.so)
+set(EXTRA_DIR ${CMAKE_CURRENT_LIST_DIR}/../../../../extra)
 
-## libavformat.so
-add_library(libavformat SHARED IMPORTED)
-set_target_properties(libavformat PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/../jniLibs/${ANDROID_ABI}/libavformat.so)
+include_directories(${EXTRA_DIR}/${ANDROID_ABI}/include)
 
-## libavutil.so
-add_library(libavutil SHARED IMPORTED)
-set_target_properties(libavutil PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/../jniLibs/${ANDROID_ABI}/libavutil.so)
+## libavcodec.a
+add_library(libavcodec STATIC IMPORTED)
+set_target_properties(libavcodec PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/${ANDROID_ABI}/lib/libavcodec.a)
 
-## libswresample.so
-add_library(libswresample SHARED IMPORTED)
-set_target_properties(libswresample PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/../jniLibs/${ANDROID_ABI}/libswresample.so)
+## libavformat.a
+add_library(libavformat STATIC IMPORTED)
+set_target_properties(libavformat PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/${ANDROID_ABI}/lib/libavformat.a)
 
-## libswscale.so
-add_library(libswscale SHARED IMPORTED)
-set_target_properties(libswscale PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/../jniLibs/${ANDROID_ABI}/libswscale.so)
+## libavutil.a
+add_library(libavutil STATIC IMPORTED)
+set_target_properties(libavutil PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/${ANDROID_ABI}/lib/libavutil.a)
+
+## libswresample.a
+add_library(libswresample STATIC IMPORTED)
+set_target_properties(libswresample PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/${ANDROID_ABI}/lib/libswresample.a)
+
+## libswscale.a
+add_library(libswscale STATIC IMPORTED)
+set_target_properties(libswscale PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/${ANDROID_ABI}/lib/libswscale.a)
 
 include_directories(.)
 
@@ -59,11 +63,10 @@ find_library( # Sets the name of the path variable.
 
 target_link_libraries( # Specifies the target library.
         media_muxer
-        libavcodec
+        log
+        z
         libavformat
+        libavcodec
         libavutil
         libswresample
-        libswscale
-        # Links the target library to the log library
-        # included in the NDK.
-        ${log-lib})
+        libswscale)

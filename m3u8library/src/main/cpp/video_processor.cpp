@@ -74,7 +74,7 @@ Java_com_jeffmony_m3u8library_VideoProcessor_transformVideo(JNIEnv *env, jobject
     const char *in_filename = env->GetStringUTFChars(input_path, 0);
     const char *out_filename = env->GetStringUTFChars(output_path, 0);
     LOGI("Input_path=%s, Output_path=%s", in_filename, out_filename);
-    AVOutputFormat *ofmt = NULL;
+    const AVOutputFormat *ofmt = NULL;
     AVFormatContext *ifmt_ctx = NULL, *ofmt_ctx = NULL;
     AVPacket pkt;
     int ret, i;
@@ -115,8 +115,8 @@ Java_com_jeffmony_m3u8library_VideoProcessor_transformVideo(JNIEnv *env, jobject
     }
     LOGI("Output format=%s", ofmt_ctx->oformat->name);
 
-    ofmt_ctx->oformat->flags |= AVFMT_TS_NONSTRICT;
-    ofmt_ctx->oformat->flags |= AVFMT_NODIMENSIONS;
+//    ofmt_ctx->oformat->flags |= AVFMT_TS_NONSTRICT;
+//    ofmt_ctx->oformat->flags |= AVFMT_NODIMENSIONS;
 
     stream_mapping_size = ifmt_ctx->nb_streams;
     stream_mapping = (int *) av_mallocz_array(stream_mapping_size, sizeof(*stream_mapping));

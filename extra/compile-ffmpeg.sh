@@ -88,10 +88,8 @@ ffmpeg_configure() {
     FF_CONFIG="${FF_CONFIG} --disable-devices"
     FF_CONFIG="${FF_CONFIG} --disable-debug"
     FF_CONFIG="${FF_CONFIG} --disable-doc"
-    FF_CONFIG="${FF_CONFIG} --disable-bsfs"
     FF_CONFIG="${FF_CONFIG} --enable-cross-compile"
-    FF_CONFIG="${FF_CONFIG} --disable-filters"
-    FF_CONFIG="${FF_CONFIG} --enable-filter=aresample"
+    FF_CONFIG="${FF_CONFIG} --disable-bsfs"
     FF_CONFIG="${FF_CONFIG} --enable-bsf=aac_adtstoasc"
     FF_CONFIG="${FF_CONFIG} --enable-bsf=h264_mp4toannexb"
     FF_CONFIG="${FF_CONFIG} --enable-small"
@@ -103,25 +101,39 @@ ffmpeg_configure() {
     FF_CONFIG="${FF_CONFIG} --enable-fft"
     FF_CONFIG="${FF_CONFIG} --enable-version3"
     FF_CONFIG="${FF_CONFIG} --enable-nonfree"
+    FF_CONFIG="${FF_CONFIG} --disable-filters"
     FF_CONFIG="${FF_CONFIG} --disable-encoders"
-    FF_CONFIG="${FF_CONFIG} --enable-encoder=pcm_s16le"
-    FF_CONFIG="${FF_CONFIG} --enable-encoder=aac"
-    FF_CONFIG="${FF_CONFIG} --enable-encoder=mp2"
     FF_CONFIG="${FF_CONFIG} --disable-decoders"
     FF_CONFIG="${FF_CONFIG} --disable-parsers"
-    FF_CONFIG="${FF_CONFIG} --enable-parser=aac"
-    FF_CONFIG="${FF_CONFIG} --enable-parser=h264"
-    FF_CONFIG="${FF_CONFIG} --enable-parser=hevc"
     FF_CONFIG="${FF_CONFIG} --disable-muxers"
-    FF_CONFIG="${FF_CONFIG} --enable-muxer=flv"
-    FF_CONFIG="${FF_CONFIG} --enable-muxer=mp4"
-    FF_CONFIG="${FF_CONFIG} --enable-muxer=h264"
-    FF_CONFIG="${FF_CONFIG} --enable-muxer=hevc"
-    FF_CONFIG="${FF_CONFIG} --enable-muxer=wav"
-    FF_CONFIG="${FF_CONFIG} --enable-muxer=adts"
     FF_CONFIG="${FF_CONFIG} --disable-demuxers"
     FF_CONFIG="${FF_CONFIG} --disable-protocols"
+    FF_CONFIG="${FF_CONFIG} --disable-avfilter"
+    FF_CONFIG="${FF_CONFIG} --disable-postproc"
+
+    # 协议
     FF_CONFIG="${FF_CONFIG} --enable-protocol=file"
+
+    # 增加解封装
+    FF_CONFIG="${FF_CONFIG} --enable-demuxer=hls"
+    FF_CONFIG="${FF_CONFIG} --enable-demuxer=mpegts"
+    FF_CONFIG="${FF_CONFIG} --enable-demuxer=mpegtsraw"
+    FF_CONFIG="${FF_CONFIG} --enable-demuxer=mpegps"
+    FF_CONFIG="${FF_CONFIG} --enable-demuxer=mpegvideo"
+
+    # 增加封装
+    FF_CONFIG="${FF_CONFIG} --enable-muxer=mp4"
+    FF_CONFIG="${FF_CONFIG} --enable-muxer=mov"
+    FF_CONFIG="${FF_CONFIG} --enable-muxer=m4v"
+
+    # 增加parser
+    FF_CONFIG="${FF_CONFIG} --enable-parser=h264"
+    FF_CONFIG="${FF_CONFIG} --enable-parser=hevc"
+
+    # 增加decoder
+    FF_CONFIG="${FF_CONFIG} --enable-decoder=h264"
+    FF_CONFIG="${FF_CONFIG} --enable-decoder=aac"
+    FF_CONFIG="${FF_CONFIG} --enable-decoder=hevc"
 }
 
 build() {

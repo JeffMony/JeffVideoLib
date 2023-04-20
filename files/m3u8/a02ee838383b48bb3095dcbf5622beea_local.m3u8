@@ -1,0 +1,9 @@
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-MEDIA-SEQUENCE:2
+#EXT-X-TARGETDURATION:10.0
+#EXTINF:10.0,
+/storage/emulated/0/Android/data/com.jeffmony.videodemo/files/Video/Download/a02ee838383b48bb3095dcbf5622beea/video_0.ts
+#EXTINF:2.08,
+/storage/emulated/0/Android/data/com.jeffmony.videodemo/files/Video/Download/a02ee838383b48bb3095dcbf5622beea/video_1.ts
+#EXT-X-ENDLIST

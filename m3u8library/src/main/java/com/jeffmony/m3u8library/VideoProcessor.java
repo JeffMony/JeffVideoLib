@@ -1,7 +1,5 @@
 package com.jeffmony.m3u8library;
 
-import androidx.annotation.NonNull;
-
 import com.jeffmony.m3u8library.listener.IVideoTransformProgressListener;
 
 public class VideoProcessor {
@@ -14,14 +12,7 @@ public class VideoProcessor {
         synchronized (VideoProcessor.class) {
             if (!mIsLibLoaded) {
                 System.loadLibrary("media_muxer");
-                System.loadLibrary("avcodec");
-                System.loadLibrary("avformat");
-                System.loadLibrary("avutil");
-                System.loadLibrary("swresample");
-                System.loadLibrary("swscale");
-
                 mIsLibLoaded = true;
-
                 initFFmpegOptions();
             }
         }
@@ -36,7 +27,7 @@ public class VideoProcessor {
     //转化视频的封装格式,M3U8 转化为 MP4格式
     public native int transformVideo(String inputPath, String outputPath);
 
-    public void setOnVideoTransformProgressListener(@NonNull IVideoTransformProgressListener listener) {
+    public void setOnVideoTransformProgressListener(IVideoTransformProgressListener listener) {
         mListener = listener;
     }
 

@@ -1,0 +1,9 @@
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-MEDIA-SEQUENCE:2
+#EXT-X-TARGETDURATION:10.0
+#EXTINF:10.0,
+https://vod.soundstage.cn/f7695410d4f371ed8d6c16b5feac0102/video/81eb3c63bfd74856b5d7922b04155f65-4f17abef18d33e3f2151dbde92e4ccbd-video-ld-00001.ts?auth_key=1681890446-e93a1a43c99f4d75afad9322c0e8d1cb-0-f0bd46ff0c719b19aecf08131f04715a
+#EXTINF:2.08,
+https://vod.soundstage.cn/f7695410d4f371ed8d6c16b5feac0102/video/81eb3c63bfd74856b5d7922b04155f65-4f17abef18d33e3f2151dbde92e4ccbd-video-ld-00002.ts?auth_key=1681890446-e93a1a43c99f4d75afad9322c0e8d1cb-0-eb877c8313eb08e88fcfebac3abec731
+#EXT-X-ENDLIST

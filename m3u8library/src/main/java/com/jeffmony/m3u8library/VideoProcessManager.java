@@ -2,8 +2,6 @@ package com.jeffmony.m3u8library;
 
 import android.text.TextUtils;
 
-import androidx.annotation.NonNull;
-
 import com.jeffmony.m3u8library.listener.IVideoTransformListener;
 import com.jeffmony.m3u8library.listener.IVideoTransformProgressListener;
 import com.jeffmony.m3u8library.thread.VideoProcessThreadHandler;
@@ -25,7 +23,7 @@ public class VideoProcessManager {
         return sInstance;
     }
 
-    public void transformM3U8ToMp4(final String inputFilePath, final String outputFilePath, @NonNull final IVideoTransformListener listener) {
+    public void transformM3U8ToMp4(final String inputFilePath, final String outputFilePath, final IVideoTransformListener listener) {
         if (TextUtils.isEmpty(inputFilePath) || TextUtils.isEmpty(outputFilePath)) {
             listener.onTransformFailed(new Exception("Input or output File is empty"));
             return;
@@ -56,7 +54,7 @@ public class VideoProcessManager {
     }
 
     //回调信息
-    private void notifyOnTransformProgress(@NonNull final IVideoTransformListener listener, final float progress) {
+    private void notifyOnTransformProgress(final IVideoTransformListener listener, final float progress) {
         VideoProcessThreadHandler.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -65,7 +63,7 @@ public class VideoProcessManager {
         });
     }
 
-    private void notifyOnTransformFinished(@NonNull final IVideoTransformListener listener) {
+    private void notifyOnTransformFinished(final IVideoTransformListener listener) {
         VideoProcessThreadHandler.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -74,7 +72,7 @@ public class VideoProcessManager {
         });
     }
 
-    private void notifyOnMergeFailed(@NonNull final IVideoTransformListener listener, final int result) {
+    private void notifyOnMergeFailed(final IVideoTransformListener listener, final int result) {
         VideoProcessThreadHandler.runOnUiThread(new Runnable() {
             @Override
             public void run() {
