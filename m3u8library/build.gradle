@@ -16,6 +16,10 @@ android {
 
         externalNativeBuild {
             cmake {
+                arguments "-DANDROID_ARM_NEON=TRUE",
+                          "-DANDROID_TOOLCHAIN=clang",
+                          "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
+                          "-DENABLE_CMAKE_COMPILE=${enable_cmake_compile}"
                 cppFlags "-fexceptions"
                 abiFilters "armeabi-v7a", "arm64-v8a"
             }
@@ -39,6 +43,11 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    packagingOptions {
+        pickFirst 'lib/armeabi-v7a/libmedia_muxer.so'
+        pickFirst 'lib/arm64-v8a/libmedia_muxer.so'
     }
 
     ndkVersion '21.1.6352462'
