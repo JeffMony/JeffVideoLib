@@ -76,8 +76,8 @@ init_x86() {
 ffmpeg_configure() {
     FF_CONFIG=""
     FF_CONFIG="${FF_CONFIG} --enable-gpl"
-    FF_CONFIG="${FF_CONFIG} --disable-shared"
-    FF_CONFIG="${FF_CONFIG} --enable-static"
+    FF_CONFIG="${FF_CONFIG} --enable-shared"
+    FF_CONFIG="${FF_CONFIG} --disable-static"
     FF_CONFIG="${FF_CONFIG} --disable-stripping"
     FF_CONFIG="${FF_CONFIG} --disable-ffmpeg"
     FF_CONFIG="${FF_CONFIG} --disable-ffplay"
@@ -162,8 +162,6 @@ build() {
     --sysroot=${TOOLCHAIN_PATH}/sysroot \
     ${ASM_SWITCH} \
     ${FF_CONFIG} \
-    --extra-cflags="${EXTRA_CFLAGS}" \
-    --extra-ldflags="${EXTRA_LDFLAGS}" \
     --cc=${TOOLCHAIN_PATH}/bin/${ARCH2}-linux-${ANDROID}${API}-clang \
     --cxx=${TOOLCHAIN_PATH}/bin/${ARCH2}-linux-${ANDROID}${API}-clang++ \
     --cross-prefix=${TOOLCHAIN_PATH}/bin/${ARCH1}-linux-${ANDROID}-
@@ -179,6 +177,13 @@ build() {
 ffmpeg_configure
 
 case "$1" in
+    all)
+        init_arm32
+        build
+
+        init_arm64
+        build
+    ;;
     arm)
         init_arm32
         build

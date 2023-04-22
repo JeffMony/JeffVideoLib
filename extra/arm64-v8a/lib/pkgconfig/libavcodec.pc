@@ -5,10 +5,10 @@ includedir=/Users/jefflee/source/JeffM3U8Lib/extra/build/ffmpeg/arm64-v8a/includ
 
 Name: libavcodec
 Description: FFmpeg codec library
-Version: 59.37.100
-Requires: libavutil >= 57.28.100
-Requires.private: 
+Version: 58.18.100
+Requires: 
+Requires.private: libavutil >= 56.14.100
 Conflicts:
-Libs: -L${libdir}  -lavcodec -pthread -lm -latomic
-Libs.private: 
+Libs: -L${libdir}  -lavcodec 
+Libs.private: -pthread -lm
 Cflags: -I${includedir}

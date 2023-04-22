@@ -11,6 +11,11 @@ public class VideoProcessor {
     public static void loadLibrariesOnce() {
         synchronized (VideoProcessor.class) {
             if (!mIsLibLoaded) {
+                System.loadLibrary("avcodec");
+                System.loadLibrary("avformat");
+                System.loadLibrary("avutil");
+                System.loadLibrary("swresample");
+                System.loadLibrary("swscale");
                 System.loadLibrary("media_muxer");
                 mIsLibLoaded = true;
                 initFFmpegOptions();

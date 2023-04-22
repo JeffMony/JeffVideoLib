@@ -5,10 +5,10 @@ includedir=/Users/jefflee/source/JeffM3U8Lib/extra/build/ffmpeg/arm64-v8a/includ
 
 Name: libavformat
 Description: FFmpeg container format library
-Version: 59.27.100
-Requires: libavcodec >= 59.37.100, libavutil >= 57.28.100
-Requires.private: 
+Version: 58.12.100
+Requires: 
+Requires.private: libavcodec >= 58.18.100, libavutil >= 56.14.100
 Conflicts:
-Libs: -L${libdir}  -lavformat -lm -lz -latomic
-Libs.private: 
+Libs: -L${libdir}  -lavformat 
+Libs.private: -lm -lz
 Cflags: -I${includedir}

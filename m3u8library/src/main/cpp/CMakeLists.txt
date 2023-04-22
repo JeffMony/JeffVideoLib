@@ -9,25 +9,25 @@ set(EXTRA_DIR ${CMAKE_CURRENT_LIST_DIR}/../../../../extra)
 
 include_directories(${EXTRA_DIR}/${ANDROID_ABI}/include)
 
-## libavcodec.a
-add_library(libavcodec STATIC IMPORTED)
-set_target_properties(libavcodec PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/${ANDROID_ABI}/lib/libavcodec.a)
+## libavcodec.so
+add_library(libavcodec SHARED IMPORTED)
+set_target_properties(libavcodec PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/${ANDROID_ABI}/lib/libavcodec.so)
 
-## libavformat.a
-add_library(libavformat STATIC IMPORTED)
-set_target_properties(libavformat PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/${ANDROID_ABI}/lib/libavformat.a)
+## libavformat.so
+add_library(libavformat SHARED IMPORTED)
+set_target_properties(libavformat PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/${ANDROID_ABI}/lib/libavformat.so)
 
-## libavutil.a
-add_library(libavutil STATIC IMPORTED)
-set_target_properties(libavutil PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/${ANDROID_ABI}/lib/libavutil.a)
+## libavutil.so
+add_library(libavutil SHARED IMPORTED)
+set_target_properties(libavutil PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/${ANDROID_ABI}/lib/libavutil.so)
 
-## libswresample.a
-add_library(libswresample STATIC IMPORTED)
-set_target_properties(libswresample PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/${ANDROID_ABI}/lib/libswresample.a)
+## libswresample.so
+add_library(libswresample SHARED IMPORTED)
+set_target_properties(libswresample PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/${ANDROID_ABI}/lib/libswresample.so)
 
-## libswscale.a
-add_library(libswscale STATIC IMPORTED)
-set_target_properties(libswscale PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/${ANDROID_ABI}/lib/libswscale.a)
+## libswscale.so
+add_library(libswscale SHARED IMPORTED)
+set_target_properties(libswscale PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/${ANDROID_ABI}/lib/libswscale.so)
 
 include_directories(.)
 

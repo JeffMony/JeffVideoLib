@@ -5,10 +5,10 @@ includedir=/Users/jefflee/source/JeffM3U8Lib/extra/build/ffmpeg/armeabi-v7a/incl
 
 Name: libswscale
 Description: FFmpeg image rescaling library
-Version: 6.7.100
-Requires: libavutil >= 57.28.100
-Requires.private: 
+Version: 5.1.100
+Requires: 
+Requires.private: libavutil >= 56.14.100
 Conflicts:
-Libs: -L${libdir}  -lswscale -lm -latomic
-Libs.private: 
+Libs: -L${libdir}  -lswscale 
+Libs.private: -lm
 Cflags: -I${includedir}
