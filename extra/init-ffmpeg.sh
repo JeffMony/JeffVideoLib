@@ -2,8 +2,8 @@
 
 # download ffmpeg source
 
-FFMPEG_UPSTREAM=https://github.com/FFmpeg/FFmpeg
-TAG_NAME=n5.1
+FFMPEG_UPSTREAM=git@github.com:JeffMony/FFmpeg.git
+TAG_NAME=n6.0
 
 CUR_DIR=$(pwd)
 

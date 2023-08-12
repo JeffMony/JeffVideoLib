@@ -7,27 +7,33 @@ cmake_minimum_required(VERSION 3.4.1)
 
 set(EXTRA_DIR ${CMAKE_CURRENT_LIST_DIR}/../../../../extra)
 
-include_directories(${EXTRA_DIR}/${ANDROID_ABI}/include)
+include_directories(${EXTRA_DIR}/output/ffmpeg/${ANDROID_ABI}/include)
 
 ## libavcodec.so
-add_library(libavcodec SHARED IMPORTED)
-set_target_properties(libavcodec PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/${ANDROID_ABI}/lib/libavcodec.so)
+add_library(libavcodec STATIC IMPORTED)
+set_target_properties(libavcodec PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/output/ffmpeg/${ANDROID_ABI}/lib/libavcodec.a)
 
 ## libavformat.so
-add_library(libavformat SHARED IMPORTED)
-set_target_properties(libavformat PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/${ANDROID_ABI}/lib/libavformat.so)
+add_library(libavformat STATIC IMPORTED)
+set_target_properties(libavformat PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/output/ffmpeg/${ANDROID_ABI}/lib/libavformat.a)
 
 ## libavutil.so
-add_library(libavutil SHARED IMPORTED)
-set_target_properties(libavutil PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/${ANDROID_ABI}/lib/libavutil.so)
+add_library(libavutil STATIC IMPORTED)
+set_target_properties(libavutil PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/output/ffmpeg/${ANDROID_ABI}/lib/libavutil.a)
 
 ## libswresample.so
-add_library(libswresample SHARED IMPORTED)
-set_target_properties(libswresample PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/${ANDROID_ABI}/lib/libswresample.so)
+add_library(libswresample STATIC IMPORTED)
+set_target_properties(libswresample PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/output/ffmpeg/${ANDROID_ABI}/lib/libswresample.a)
 
 ## libswscale.so
-add_library(libswscale SHARED IMPORTED)
-set_target_properties(libswscale PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/${ANDROID_ABI}/lib/libswscale.so)
+add_library(libswscale STATIC IMPORTED)
+set_target_properties(libswscale PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/output/ffmpeg/${ANDROID_ABI}/lib/libswscale.a)
+
+add_library(libssl STATIC IMPORTED)
+set_target_properties(libssl PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/output/openssl/${ANDROID_ABI}/lib/libssl.a)
+
+add_library(libcrypto STATIC IMPORTED)
+set_target_properties(libcrypto PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/output/openssl/${ANDROID_ABI}/lib/libcrypto.a)
 
 include_directories(.)
 
@@ -66,6 +72,8 @@ target_link_libraries( # Specifies the target library.
         log
         z
         libavformat
+        libssl
+        libcrypto
         libavcodec
         libavutil
         libswresample

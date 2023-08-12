@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.github.florent37.runtimepermission.RuntimePermission;
+import com.jeffmony.m3u8library.Constants;
 import com.jeffmony.m3u8library.VideoProcessManager;
 import com.jeffmony.m3u8library.listener.IVideoTransformListener;
 import com.jeffmony.m3u8library.utils.LogUtils;
@@ -20,8 +21,6 @@ import java.io.File;
 import java.text.DecimalFormat;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-
-    private static final String TAG = "MainActivity";
 
     private EditText mSrcTxt;
     private EditText mDestTxt;
@@ -54,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void doConvertVideo(String inputPath, String outputPath) {
         if (TextUtils.isEmpty(inputPath) || TextUtils.isEmpty(outputPath)) {
-            LogUtils.i(TAG, "InputPath or OutputPath is null");
+            LogUtils.i(Constants.TAG, "InputPath or OutputPath is null");
             return;
         }
         File inputFile = new File(inputPath);
@@ -66,28 +65,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             try {
                 outputFile.createNewFile();
             } catch (Exception e) {
-                LogUtils.w(TAG, "Create file failed, exception = " + e);
+                LogUtils.w(Constants.TAG, "Create file failed, exception = " + e);
                 return;
             }
         }
-        LogUtils.i(TAG, "inputPath="+inputPath+", outputPath="+outputPath);
+        LogUtils.i(Constants.TAG, "inputPath="+inputPath+", outputPath="+outputPath);
         VideoProcessManager.getInstance().transformM3U8ToMp4(inputPath, outputPath, new IVideoTransformListener() {
 
             @Override
             public void onTransformProgress(float progress) {
-                LogUtils.i(TAG, "onTransformProgress progress="+progress);
+                LogUtils.i(Constants.TAG, "onTransformProgress progress="+progress);
                 DecimalFormat format = new DecimalFormat(".00");
                 mTransformProgressTxt.setText("已经转换的进度: " + format.format(progress) + "%");
             }
 
             @Override
             public void onTransformFinished() {
-                LogUtils.i(TAG, "onTransformFinished");
+                LogUtils.i(Constants.TAG, "onTransformFinished");
             }
 
             @Override
             public void onTransformFailed(Exception e) {
-                LogUtils.i(TAG, "onTransformFailed, e="+e.getMessage());
+                LogUtils.i(Constants.TAG, "onTransformFailed, e="+e.getMessage());
             }
         });
     }

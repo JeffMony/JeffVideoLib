@@ -32,7 +32,7 @@ int64_t get_total_packets_count(const char* in_filename) {
     AVPacket pkt;
     int ret;
     int64_t total_packets_count = 0;
-    if ((ret == avformat_open_input(&ifmt_ctx, in_filename, 0, &ffmpeg_options)) < 0) {
+    if ((ret = avformat_open_input(&ifmt_ctx, in_filename, 0, &ffmpeg_options)) < 0) {
         LOGE("Could not open input file '%s'", in_filename);
         LOGE("Error occurred: %s\n", av_err2str(ret));
         avformat_close_input(&ifmt_ctx);
@@ -119,7 +119,7 @@ Java_com_jeffmony_m3u8library_VideoProcessor_transformVideo(JNIEnv *env, jobject
 //    ofmt_ctx->oformat->flags |= AVFMT_NODIMENSIONS;
 
     stream_mapping_size = ifmt_ctx->nb_streams;
-    stream_mapping = (int *) av_mallocz_array(stream_mapping_size, sizeof(*stream_mapping));
+    stream_mapping = (int *) av_malloc_array(stream_mapping_size, sizeof(*stream_mapping));
     if (!stream_mapping) {
         LOGE("Could not alloc stream mapping\n");
         avformat_close_input(&ifmt_ctx);
@@ -184,7 +184,7 @@ Java_com_jeffmony_m3u8library_VideoProcessor_transformVideo(JNIEnv *env, jobject
         LOGI("Open output file");
         ret = avio_open(&ofmt_ctx->pb, out_filename, AVIO_FLAG_WRITE);
         if (ret < 0) {
-            LOGE("Could not  '%s'", out_filename);
+            LOGE("Could not open '%s'", out_filename);
             LOGE("Error occurred: %s\n, width=%d, height=%d", av_err2str(ret), width, height);
             avformat_close_input(&ifmt_ctx);
             /* close output */

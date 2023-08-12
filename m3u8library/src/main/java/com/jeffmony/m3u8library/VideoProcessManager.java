@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.jeffmony.m3u8library.listener.IVideoTransformListener;
 import com.jeffmony.m3u8library.listener.IVideoTransformProgressListener;
 import com.jeffmony.m3u8library.thread.VideoProcessThreadHandler;
+import com.jeffmony.m3u8library.utils.LogUtils;
 
 import java.io.File;
 
@@ -33,22 +34,14 @@ public class VideoProcessManager {
             listener.onTransformFailed(new Exception("Input file is not existing"));
             return;
         }
-        VideoProcessThreadHandler.submitRunnableTask(new Runnable() {
-            @Override
-            public void run() {
-                final VideoProcessor processor = new VideoProcessor();
-                processor.setOnVideoTransformProgressListener(new IVideoTransformProgressListener() {
-                    @Override
-                    public void onTransformProgress(float progress) {
-                        notifyOnTransformProgress(listener, progress);
-                    }
-                });
-                int result = processor.transformVideo(inputFilePath, outputFilePath);
-                if (result == 1) {
-                    notifyOnTransformFinished(listener);
-                } else {
-                    notifyOnMergeFailed(listener, result);
-                }
+        VideoProcessThreadHandler.submitRunnableTask(() -> {
+            final VideoProcessor processor = new VideoProcessor();
+            processor.setOnVideoTransformProgressListener(progress -> notifyOnTransformProgress(listener, progress));
+            int result = processor.transformVideo(inputFilePath, outputFilePath);
+            if (result == 1) {
+                notifyOnTransformFinished(listener);
+            } else {
+                notifyOnMergeFailed(listener, result);
             }
         });
     }

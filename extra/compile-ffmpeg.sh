@@ -20,9 +20,11 @@ NDK_ROOT=/Users/jefflee/tools/android-ndk-r22b
 # 交叉编译工具链所在目录
 TOOLCHAIN_PATH=${NDK_ROOT}/toolchains/llvm/prebuilt/${OS_TYPE}-x86_64
 # 编译输出的目录
-BASE_DIR=$(pwd)/build/ffmpeg
+BASE_DIR=$(pwd)/output/ffmpeg
 
-cd FFmpeg
+OPENSSL_DIR=$(pwd)/output/openssl
+
+cd ffmpeg
 
 init_arm64() {
     echo "构建平台为：arm64-v8a"
@@ -76,8 +78,8 @@ init_x86() {
 ffmpeg_configure() {
     FF_CONFIG=""
     FF_CONFIG="${FF_CONFIG} --enable-gpl"
-    FF_CONFIG="${FF_CONFIG} --enable-shared"
-    FF_CONFIG="${FF_CONFIG} --disable-static"
+    FF_CONFIG="${FF_CONFIG} --disable-shared"
+    FF_CONFIG="${FF_CONFIG} --enable-static"
     FF_CONFIG="${FF_CONFIG} --disable-stripping"
     FF_CONFIG="${FF_CONFIG} --disable-ffmpeg"
     FF_CONFIG="${FF_CONFIG} --disable-ffplay"
@@ -89,9 +91,6 @@ ffmpeg_configure() {
     FF_CONFIG="${FF_CONFIG} --disable-debug"
     FF_CONFIG="${FF_CONFIG} --disable-doc"
     FF_CONFIG="${FF_CONFIG} --enable-cross-compile"
-    FF_CONFIG="${FF_CONFIG} --disable-bsfs"
-    FF_CONFIG="${FF_CONFIG} --enable-bsf=aac_adtstoasc"
-    FF_CONFIG="${FF_CONFIG} --enable-bsf=h264_mp4toannexb"
     FF_CONFIG="${FF_CONFIG} --enable-small"
     FF_CONFIG="${FF_CONFIG} --enable-dct"
     FF_CONFIG="${FF_CONFIG} --enable-dwt"
@@ -103,36 +102,59 @@ ffmpeg_configure() {
     FF_CONFIG="${FF_CONFIG} --enable-nonfree"
     FF_CONFIG="${FF_CONFIG} --disable-filters"
     FF_CONFIG="${FF_CONFIG} --disable-encoders"
-    FF_CONFIG="${FF_CONFIG} --disable-decoders"
-    FF_CONFIG="${FF_CONFIG} --disable-parsers"
-    FF_CONFIG="${FF_CONFIG} --disable-muxers"
-    FF_CONFIG="${FF_CONFIG} --disable-demuxers"
-    FF_CONFIG="${FF_CONFIG} --disable-protocols"
     FF_CONFIG="${FF_CONFIG} --disable-avfilter"
     FF_CONFIG="${FF_CONFIG} --disable-postproc"
 
+    FF_CONFIG="${FF_CONFIG} --disable-bsfs"
+    FF_CONFIG="${FF_CONFIG} --enable-bsf=aac_adtstoasc"
+    FF_CONFIG="${FF_CONFIG} --enable-bsf=h264_mp4toannexb"
+    FF_CONFIG="${FF_CONFIG} --enable-bsf=hevc_mp4toannexb"
+    FF_CONFIG="${FF_CONFIG} --enable-bsf=h264_metadata"
+    FF_CONFIG="${FF_CONFIG} --enable-bsf=hevc_metadata"
+
     # 协议
-    FF_CONFIG="${FF_CONFIG} --enable-protocol=file"
+    FF_CONFIG="${FF_CONFIG} --enable-protocols"
+#    FF_CONFIG="${FF_CONFIG} --enable-protocol=file"
+#    FF_CONFIG="${FF_CONFIG} --enable-protocol=hls"
+#    FF_CONFIG="${FF_CONFIG} --enable-protocol=crypto"
+#    FF_CONFIG="${FF_CONFIG} --enable-protocol=fd"
+#    FF_CONFIG="${FF_CONFIG} --enable-protocol=data"
+#    FF_CONFIG="${FF_CONFIG} --enable-protocol=https"
+#    FF_CONFIG="${FF_CONFIG} --enable-protocol=http"
+#    FF_CONFIG="${FF_CONFIG} --enable-protocol=tls"
+#    FF_CONFIG="${FF_CONFIG} --enable-protocol=httpproxy"
+#    FF_CONFIG="${FF_CONFIG} --enable-protocol=tcp"
 
     # 增加解封装
+    FF_CONFIG="${FF_CONFIG} --disable-demuxers"
     FF_CONFIG="${FF_CONFIG} --enable-demuxer=hls"
     FF_CONFIG="${FF_CONFIG} --enable-demuxer=mpegts"
     FF_CONFIG="${FF_CONFIG} --enable-demuxer=mpegtsraw"
     FF_CONFIG="${FF_CONFIG} --enable-demuxer=mpegps"
     FF_CONFIG="${FF_CONFIG} --enable-demuxer=mpegvideo"
+    FF_CONFIG="${FF_CONFIG} --enable-demuxer=h264"
+    FF_CONFIG="${FF_CONFIG} --enable-demuxer=hevc"
 
     # 增加封装
+    FF_CONFIG="${FF_CONFIG} --disable-muxers"
     FF_CONFIG="${FF_CONFIG} --enable-muxer=mp4"
     FF_CONFIG="${FF_CONFIG} --enable-muxer=mov"
     FF_CONFIG="${FF_CONFIG} --enable-muxer=m4v"
 
     # 增加parser
+    FF_CONFIG="${FF_CONFIG} --disable-parsers"
     FF_CONFIG="${FF_CONFIG} --enable-parser=h264"
     FF_CONFIG="${FF_CONFIG} --enable-parser=hevc"
+    FF_CONFIG="${FF_CONFIG} --enable-parser=mpeg4video"
+    FF_CONFIG="${FF_CONFIG} --enable-parser=mpegaudio"
+    FF_CONFIG="${FF_CONFIG} --enable-parser=mpegvideo"
 
     # 增加decoder
+    FF_CONFIG="${FF_CONFIG} --disable-decoders"
     FF_CONFIG="${FF_CONFIG} --enable-decoder=h264"
     FF_CONFIG="${FF_CONFIG} --enable-decoder=aac"
+    FF_CONFIG="${FF_CONFIG} --enable-decoder=aac_fixed"
+    FF_CONFIG="${FF_CONFIG} --enable-decoder=aac_latm"
     FF_CONFIG="${FF_CONFIG} --enable-decoder=hevc"
 }
 
@@ -147,6 +169,15 @@ build() {
     # 传递给链接器的标志
     EXTRA_LDFLAGS=""
     EXTRA_LDFLAGS="-O3 -lc -ldl -lm -lz -llog -lgcc -L${OUTPUT_DIR}/lib"
+
+    if [ -f "${OPENSSL_DIR}/${ABI}/lib/libssl.a" ]; then
+        echo "OpenSSL detected"
+        FF_CONFIG="${FF_CONFIG} --enable-nonfree"
+        FF_CONFIG="${FF_CONFIG} --enable-openssl"
+
+        EXTRA_CFLAGS="${EXTRA_CFLAGS} -I${OPENSSL_DIR}/${ABI}/include"
+        EXTRA_LDFLAGS="${EXTRA_LDFLAGS} -L${OPENSSL_DIR}/${ABI}/lib -lssl -lcrypto"
+    fi
 
     EXTERNAL_LINK_LIBRARY=""
     EXTERNAL_LINK_TAG=""
@@ -164,7 +195,9 @@ build() {
     ${FF_CONFIG} \
     --cc=${TOOLCHAIN_PATH}/bin/${ARCH2}-linux-${ANDROID}${API}-clang \
     --cxx=${TOOLCHAIN_PATH}/bin/${ARCH2}-linux-${ANDROID}${API}-clang++ \
-    --cross-prefix=${TOOLCHAIN_PATH}/bin/${ARCH1}-linux-${ANDROID}-
+    --cross-prefix=${TOOLCHAIN_PATH}/bin/${ARCH1}-linux-${ANDROID}- \
+    --extra-cflags="${EXTRA_CFLAGS}" \
+    --extra-ldflags="${EXTRA_LDFLAGS}"
 
     # 设置编译用的核心数
     make clean
@@ -184,7 +217,7 @@ case "$1" in
         init_arm64
         build
     ;;
-    arm)
+    armv7a)
         init_arm32
         build
     ;;

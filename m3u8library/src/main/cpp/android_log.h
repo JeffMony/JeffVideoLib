@@ -2,7 +2,7 @@
 
 static int use_log_report = 0;
 
-#define FF_LOG_TAG     "FFmpeg_JeffMony"
+#define FF_LOG_TAG     "Video_Merge"
 
 #define FF_LOG_VERBOSE        ANDROID_LOG_VERBOSE
 #define FF_LOG_DEBUG          ANDROID_LOG_DEBUG
