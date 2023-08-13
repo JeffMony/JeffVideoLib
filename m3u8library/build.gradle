@@ -7,7 +7,7 @@ android {
     buildToolsVersion "29.0.3"
 
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -16,7 +16,8 @@ android {
 
         externalNativeBuild {
             cmake {
-                cppFlags "-std=c++11 -fexceptions -frtti -v"
+                cppFlags "-fvisibility=hidden -fvisibility-inlines-hidden", "-ffunction-sections -fdata-sections"
+                cFlags "-std=c99", "-fvisibility=hidden -fvisibility-inlines-hidden", "-ffunction-sections -fdata-sections"
                 abiFilters "armeabi-v7a", "arm64-v8a"
             }
         }
@@ -46,7 +47,7 @@ android {
         pickFirst 'lib/arm64-v8a/libmedia_muxer.so'
     }
 
-    ndkVersion '16.1.4479499'
+    ndkVersion '22.1.7171670'
 }
 
 dependencies {

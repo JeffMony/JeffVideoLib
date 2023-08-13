@@ -165,10 +165,8 @@ build() {
     SYSROOT_L=${TOOLCHAIN_PATH}/sysroot/usr/lib/${ARCH1}-linux-${ANDROID}
     # 传递给编译器的标志
     EXTRA_CFLAGS=""
-    EXTRA_CFLAGS="-O3 -fpic ${PRE_CFLAGS} -I${OUTPUT_DIR}/include"
     # 传递给链接器的标志
     EXTRA_LDFLAGS=""
-    EXTRA_LDFLAGS="-O3 -lc -ldl -lm -lz -llog -lgcc -L${OUTPUT_DIR}/lib"
 
     if [ -f "${OPENSSL_DIR}/${ABI}/lib/libssl.a" ]; then
         echo "OpenSSL detected"

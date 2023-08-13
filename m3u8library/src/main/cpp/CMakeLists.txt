@@ -5,6 +5,11 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
+set(-DCMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Wall -s -Wdeprecated-declarations")
+set(-DCMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -s -Wdeprecated-declarations")
+
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--exclude-libs,ALL -O3 -flto -Wl,--gc-sections")
+
 set(EXTRA_DIR ${CMAKE_CURRENT_LIST_DIR}/../../../../extra)
 
 include_directories(${EXTRA_DIR}/output/ffmpeg/${ANDROID_ABI}/include)
@@ -72,9 +77,9 @@ target_link_libraries( # Specifies the target library.
         log
         z
         libavformat
-        libssl
-        libcrypto
         libavcodec
         libavutil
         libswresample
-        libswscale)
+        libswscale
+        libssl
+        libcrypto)
