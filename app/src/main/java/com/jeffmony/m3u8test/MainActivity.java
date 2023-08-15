@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onTransformFinished() {
                 Log.i(Constants.TAG, "onTransformFinished");
+                mTransformProgressTxt.setText("转换完成");
             }
 
             @Override

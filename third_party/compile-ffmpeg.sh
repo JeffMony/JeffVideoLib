@@ -177,10 +177,8 @@ build() {
         EXTRA_LDFLAGS="${EXTRA_LDFLAGS} -L${OPENSSL_DIR}/${ABI}/lib -lssl -lcrypto"
     fi
 
-    EXTERNAL_LINK_LIBRARY=""
-    EXTERNAL_LINK_TAG=""
-
     rm -rf ${OUTPUT_DIR}
+    make clean
 
     echo "FFmpeg 编译开始"
     ./configure \
@@ -198,8 +196,7 @@ build() {
     --extra-ldflags="${EXTRA_LDFLAGS}"
 
     # 设置编译用的核心数
-    make clean
-    make -j4
+    make -j2
     make install
     echo "FFmpeg 编译结束"
 }

@@ -18,7 +18,7 @@
         <EditText
             android:id="@+id/src_path_txt"
             android:hint="请输入原文件"
-            android:text="/sdcard/Pictures/4e72a5129105df72270e8d2deb1d75f7/4e72a5129105df72270e8d2deb1d75f7_local.m3u8"
+            android:text="/sdcard/Pictures/4e72a5129105df72270e8d2deb1d75f7/4e72a5129105df72270e8d2deb1d75f7_local_key_url.m3u8"
             android:layout_width="match_parent"
             android:layout_height="150dp" />
 

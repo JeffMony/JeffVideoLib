@@ -11,7 +11,6 @@ extern "C" {
 #include "android_log.h"
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
-#include "libavutil/mem.h"
 #include "libavutil/mathematics.h"
 #include "libavutil/timestamp.h"
 }
@@ -22,10 +21,7 @@ VideoProcessor::VideoProcessor(jobject object)
   : video_process_object_(object)
   , handler_(nullptr)
   , handler_thread_(nullptr)
-  , listener_key_(0)
-  , listener_mutex_()
   , transform_progress_(0.0f) {
-  pthread_mutex_init(&listener_mutex_, nullptr);
   std::string name("Video-Processor-Thread");
   handler_thread_ = thread::HandlerThread::Create(name);
   handler_ = new thread::Handler(handler_thread_->GetLooper(), this);
@@ -42,13 +38,11 @@ void VideoProcessor::TransformVideo(const char *input_path, const char *output_p
   length = strlen(output_path) + 1;
   auto output_str = new char[length];
   snprintf(output_str, length, "%s%c", output_path, 0);
-  int key = listener_key_++;
-  UpdateListener(key, listener);
   thread::Message *msg = new thread::Message();
   msg->what = kTransformVideo;
-  msg->arg1 = key;
   msg->obj1 = input_str;
   msg->obj2 = output_str;
+  msg->obj3 = listener;
   handler_->SendMessage(msg);
 }
 
@@ -60,13 +54,15 @@ void VideoProcessor::TransformVideoInternal(const char *input_path, const char *
   AVFormatContext *input_context = NULL;
   int ret = avformat_open_input(&input_context, input_path, 0, &ffmpeg_options);
   if (ret < 0) {
+    av_dict_free(&ffmpeg_options);
     avformat_close_input(&input_context);
     LOGE("%s %s %d avformat_open_input failed msg=%s", __FILE_NAME__, __func__ , __LINE__, av_err2str(ret));
     CallOnTransformFailed(listener, -2);
     return;
   }
-  ret = avformat_find_stream_info(input_context, &ffmpeg_options);
+  ret = avformat_find_stream_info(input_context, NULL);
   if (ret < 0) {
+    av_dict_free(&ffmpeg_options);
     avformat_close_input(&input_context);
     LOGE("%s %s %d avformat_find_stream_info failed msg=%s", __FILE_NAME__, __func__ , __LINE__, av_err2str(ret));
     CallOnTransformFailed(listener, -3);
@@ -77,6 +73,7 @@ void VideoProcessor::TransformVideoInternal(const char *input_path, const char *
   AVFormatContext *output_context = NULL;
   ret = avformat_alloc_output_context2(&output_context, NULL, NULL, output_path);
   if (ret < 0) {
+    av_dict_free(&ffmpeg_options);
     avformat_close_input(&input_context);
     avformat_free_context(output_context);
     LOGE("%s %s %d avformat_alloc_output_context2 failed msg=%s", __FILE_NAME__, __func__ , __LINE__, av_err2str(ret));
@@ -89,7 +86,7 @@ void VideoProcessor::TransformVideoInternal(const char *input_path, const char *
   int width;
   int height;
   int stream_index = 0;
-  int total_video_packet_count = 0;
+  int64_t video_duration = 0;
   int video_stream_index = -1;
   for (int index = 0; index < stream_size; index++) {
     AVStream *out_stream;
@@ -110,13 +107,14 @@ void VideoProcessor::TransformVideoInternal(const char *input_path, const char *
       if (width == 0 || height == 0) {
         avformat_close_input(&input_context);
         avformat_free_context(output_context);
+        av_dict_free(&ffmpeg_options);
         av_freep(&streams);
         LOGE("%s %s %d input file has no width or height, w=%d h=%d", __FILE_NAME__, __func__ , __LINE__, width, height);
         CallOnTransformFailed(listener, -5);
         return;
       }
-      total_video_packet_count = avformat_index_get_entries_count(in_stream);
-      LOGI("%s %s %d total_video_packet_count=%d", __FILE_NAME__, __func__ , __LINE__, total_video_packet_count);
+      video_duration = av_rescale_q(in_stream->duration, in_stream->time_base, AV_TIME_BASE_Q) / 1000;
+      LOGI("%s %s %d video_duration=%d", __FILE_NAME__, __func__ , __LINE__, video_duration);
     }
 
     streams[index] = stream_index++;
@@ -124,6 +122,7 @@ void VideoProcessor::TransformVideoInternal(const char *input_path, const char *
     if (!out_stream) {
       avformat_close_input(&input_context);
       avformat_free_context(output_context);
+      av_dict_free(&ffmpeg_options);
       av_freep(&streams);
       LOGE("%s %s %d Failed to allocate output stream", __FILE_NAME__, __func__ , __LINE__);
       CallOnTransformFailed(listener, -6);
@@ -133,6 +132,7 @@ void VideoProcessor::TransformVideoInternal(const char *input_path, const char *
     if (ret < 0) {
       avformat_close_input(&input_context);
       avformat_free_context(output_context);
+      av_dict_free(&ffmpeg_options);
       av_freep(&streams);
       LOGE("%s %s %d avcodec_parameters_copy failed msg=%s", __FILE_NAME__, __func__ , __LINE__, av_err2str(ret));
       CallOnTransformFailed(listener, -7);
@@ -140,9 +140,14 @@ void VideoProcessor::TransformVideoInternal(const char *input_path, const char *
     }
     out_stream->codecpar->codec_tag = 0;
   }
+  if (video_duration < 0) {
+    video_duration = input_context->duration;
+    video_duration = video_duration / 1000;
+  }
   if (video_stream_index == -1) {
     avformat_close_input(&input_context);
     avformat_free_context(output_context);
+    av_dict_free(&ffmpeg_options);
     av_freep(&streams);
     LOGE("%s %s %d Input file has no video stream", __FILE_NAME__, __func__ , __LINE__);
     CallOnTransformFailed(listener, -8);
@@ -157,6 +162,7 @@ void VideoProcessor::TransformVideoInternal(const char *input_path, const char *
         avio_closep(&output_context->pb);
       }
       avformat_free_context(output_context);
+      av_dict_free(&ffmpeg_options);
       av_freep(&streams);
       CallOnTransformFailed(listener, -9);
       return;
@@ -169,6 +175,7 @@ void VideoProcessor::TransformVideoInternal(const char *input_path, const char *
       avio_closep(&output_context->pb);
     }
     avformat_free_context(output_context);
+    av_dict_free(&ffmpeg_options);
     av_freep(&streams);
     LOGE("%s %s %d avformat_write_header failed msg=%s", __FILE_NAME__, __func__ , __LINE__, av_err2str(ret));
     CallOnTransformFailed(listener, -10);
@@ -178,7 +185,6 @@ void VideoProcessor::TransformVideoInternal(const char *input_path, const char *
   int64_t last_dts = 0;
   int64_t first_pts_dts = 0;
   int first_pkt = 0;
-  int video_packet_count = 0;
   while(1) {
     AVStream *in_stream, *out_stream;
     ret = av_read_frame(input_context, packet);
@@ -190,14 +196,6 @@ void VideoProcessor::TransformVideoInternal(const char *input_path, const char *
         streams[packet->stream_index] < 0) {
       av_packet_unref(packet);
       continue;
-    }
-    if (video_stream_index == packet->stream_index) {
-      video_packet_count++;
-    }
-    float progress = video_packet_count * 1.0f * 100 / total_video_packet_count;
-    if (abs(transform_progress_ - progress) > 0.5f || abs(progress - 100) < 0.1f) {
-      CallOnTransformProgress(listener, progress);
-      transform_progress_ = progress;
     }
 
     packet->stream_index = streams[packet->stream_index];
@@ -230,9 +228,17 @@ void VideoProcessor::TransformVideoInternal(const char *input_path, const char *
       first_pts_dts = packet->pts;
       first_pkt++;
     }
-
     packet->pts = packet->pts - first_pts_dts;
     packet->dts = packet->dts - first_pts_dts;
+
+    if (video_stream_index == packet->stream_index) {
+      int64_t video_pts = av_rescale_q(packet->pts, in_stream->time_base, AV_TIME_BASE_Q) / 1000;
+      float progress = video_pts * 1.0f * 100 / video_duration;
+      if (abs(transform_progress_ - progress) > 0.5f || abs(progress - 100) < 0.1f) {
+        CallOnTransformProgress(listener, progress);
+        transform_progress_ = progress;
+      }
+    }
 
     packet->pts = av_rescale_q_rnd(packet->pts, in_stream->time_base, out_stream->time_base,
                                static_cast<AVRounding>(AV_ROUND_NEAR_INF |
@@ -246,11 +252,14 @@ void VideoProcessor::TransformVideoInternal(const char *input_path, const char *
     ret = av_interleaved_write_frame(output_context, packet);
 
     if (ret < 0) {
+      av_packet_unref(packet);
+      av_packet_free(&packet);
       avformat_close_input(&input_context);
       if (output_context && output_context->pb) {
         avio_closep(&output_context->pb);
       }
       avformat_free_context(output_context);
+      av_dict_free(&ffmpeg_options);
       av_freep(&streams);
       LOGE("%s %s %d av_interleaved_write_frame failed msg=%s", __FILE_NAME__, __func__ , __LINE__, av_err2str(ret));
       CallOnTransformFailed(listener, -11);
@@ -259,43 +268,28 @@ void VideoProcessor::TransformVideoInternal(const char *input_path, const char *
     av_packet_unref(packet);
   }
   av_packet_free(&packet);
-
-  avformat_close_input(&input_context);
-  if (output_context && output_context->pb) {
-    avio_closep(&output_context->pb);
-  }
-  avformat_free_context(output_context);
-  av_freep(&streams);
-  LOGE("%s %s %d TransformFinished", __FILE_NAME__, __func__ , __LINE__);
-  CallOnTransformFinished(listener);
-}
-
-jobject VideoProcessor::GetListener(int key) {
-  jobject ret = nullptr;
-  pthread_mutex_lock(&listener_mutex_);
-  if (listener_map_.find(key) != listener_map_.end()) {
-    ret = listener_map_.at(key);
-  }
-  pthread_mutex_unlock(&listener_mutex_);
-  return ret;
-}
-
-void VideoProcessor::UpdateListener(int key, jobject listener) {
-  pthread_mutex_lock(&listener_mutex_);
-  if (listener_map_.find(key) != listener_map_.end()) {
-    listener_map_[key] = listener;
+  ret = av_write_trailer(output_context);
+  if (ret == 0) {
+    avformat_close_input(&input_context);
+    if (output_context && output_context->pb) {
+      avio_closep(&output_context->pb);
+    }
+    avformat_free_context(output_context);
+    av_dict_free(&ffmpeg_options);
+    av_freep(&streams);
+    LOGI("%s %s %d TransformFinished", __FILE_NAME__, __func__ , __LINE__);
+    CallOnTransformFinished(listener);
   } else {
-    listener_map_.insert(std::pair<int, jobject>(key, listener));
+    avformat_close_input(&input_context);
+    if (output_context && output_context->pb) {
+      avio_closep(&output_context->pb);
+    }
+    avformat_free_context(output_context);
+    av_dict_free(&ffmpeg_options);
+    av_freep(&streams);
+    LOGI("%s %s %d av_write_trailer failed msg=%s", __FILE_NAME__, __func__ , __LINE__, av_err2str(ret));
+    CallOnTransformFailed(listener, -12);
   }
-  pthread_mutex_unlock(&listener_mutex_);
-}
-
-void VideoProcessor::RemoveListener(int key) {
-  pthread_mutex_lock(&listener_mutex_);
-  if (listener_map_.find(key) != listener_map_.end()) {
-    listener_map_.erase(key);
-  }
-  pthread_mutex_unlock(&listener_mutex_);
 }
 
 void VideoProcessor::CallOnTransformFailed(jobject listener, int err) {
@@ -309,6 +303,7 @@ void VideoProcessor::CallOnTransformFailed(jobject listener, int err) {
     auto method = env->GetMethodID(clazz, "onTransformFailed", "(Lcom/jeffmony/m3u8library/listener/IVideoTransformListener;I)V");
     env->CallVoidMethod(video_process_object_, method, listener, err);
     env->DeleteLocalRef(clazz);
+    env->DeleteGlobalRef(listener);
   }
   if (ret == JNI_EDETACHED) {
     detach_env();
@@ -343,6 +338,7 @@ void VideoProcessor::CallOnTransformFinished(jobject listener) {
     auto method = env->GetMethodID(clazz, "onTransformFinished", "(Lcom/jeffmony/m3u8library/listener/IVideoTransformListener;)V");
     env->CallVoidMethod(video_process_object_, method, listener);
     env->DeleteLocalRef(clazz);
+    env->DeleteGlobalRef(listener);
   }
   if (ret == JNI_EDETACHED) {
     detach_env();
@@ -356,10 +352,8 @@ void VideoProcessor::HandleMessage(thread::Message *msg) {
     case VideoProcessorMessage::kTransformVideo: {
       auto input_path = reinterpret_cast<const char *>(msg->obj1);
       auto output_path = reinterpret_cast<const char *>(msg->obj2);
-      auto key = msg->arg1;
-      jobject listener = GetListener(key);
+      auto listener = reinterpret_cast<jobject>(msg->obj3);
       TransformVideoInternal(input_path, output_path, listener);
-      RemoveListener(key);
       delete[] input_path;
       delete[] output_path;
       break;

@@ -39,7 +39,7 @@ public class VideoProcessManager {
         mHandler = createHandler();
     }
 
-    public void transformM3U8ToMp4(final String inputPath, final String outputPath, final IVideoTransformListener listener) {
+    public void  transformM3U8ToMp4(final String inputPath, final String outputPath, final IVideoTransformListener listener) {
         if (listener == null) {
             return;
         }

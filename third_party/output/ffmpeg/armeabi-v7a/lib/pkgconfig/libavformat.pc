@@ -1,0 +1,14 @@
+prefix=/Users/jefflee/source/JeffVideoLib/third_party/output/ffmpeg/armeabi-v7a
+exec_prefix=${prefix}
+libdir=/Users/jefflee/source/JeffVideoLib/third_party/output/ffmpeg/armeabi-v7a/lib
+includedir=/Users/jefflee/source/JeffVideoLib/third_party/output/ffmpeg/armeabi-v7a/include
+
+Name: libavformat
+Description: FFmpeg container format library
+Version: 60.3.100
+Requires: libavcodec >= 60.3.100, libavutil >= 58.2.100
+Requires.private: 
+Conflicts:
+Libs: -L${libdir}  -lavformat -lm -latomic -lz -lssl -lcrypto
+Libs.private: 
+Cflags: -I${includedir}
