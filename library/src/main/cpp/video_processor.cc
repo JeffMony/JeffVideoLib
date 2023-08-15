@@ -189,7 +189,22 @@ void VideoProcessor::TransformVideoInternal(const char *input_path, const char *
     AVStream *in_stream, *out_stream;
     ret = av_read_frame(input_context, packet);
     if (ret < 0) {
+      av_packet_unref(packet);
       break;
+    }
+    if (packet->flags & AV_PKT_FLAG_CORRUPT) {
+      av_packet_unref(packet);
+      av_packet_free(&packet);
+      avformat_close_input(&input_context);
+      if (output_context && output_context->pb) {
+        avio_closep(&output_context->pb);
+      }
+      avformat_free_context(output_context);
+      av_dict_free(&ffmpeg_options);
+      av_freep(&streams);
+      LOGE("%s %s %d AVPacket is corrupted", __FILE_NAME__, __func__ , __LINE__);
+      CallOnTransformFailed(listener, -11);
+      return;
     }
     in_stream = input_context->streams[packet->stream_index];
     if (packet->stream_index >= stream_size ||
@@ -262,7 +277,7 @@ void VideoProcessor::TransformVideoInternal(const char *input_path, const char *
       av_dict_free(&ffmpeg_options);
       av_freep(&streams);
       LOGE("%s %s %d av_interleaved_write_frame failed msg=%s", __FILE_NAME__, __func__ , __LINE__, av_err2str(ret));
-      CallOnTransformFailed(listener, -11);
+      CallOnTransformFailed(listener, -12);
       return;
     }
     av_packet_unref(packet);
@@ -288,7 +303,7 @@ void VideoProcessor::TransformVideoInternal(const char *input_path, const char *
     av_dict_free(&ffmpeg_options);
     av_freep(&streams);
     LOGI("%s %s %d av_write_trailer failed msg=%s", __FILE_NAME__, __func__ , __LINE__, av_err2str(ret));
-    CallOnTransformFailed(listener, -12);
+    CallOnTransformFailed(listener, -13);
   }
 }
 
