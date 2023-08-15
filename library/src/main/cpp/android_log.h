@@ -1,4 +1,5 @@
 #include <android/log.h>
+#include "libavutil/avutil.h"
 
 static int use_log_report = 0;
 
@@ -10,7 +11,7 @@ static int use_log_report = 0;
 #define FF_LOG_WARN           ANDROID_LOG_WARN
 #define FF_LOG_ERROR          ANDROID_LOG_ERROR
 
-// 打印可变参数
+/// 打印可变参数
 #define VLOG(level, TAG, ...)    ((void)__android_log_vprint(level, TAG, __VA_ARGS__))
 
 #define ALOG(level, TAG, ...)    ((void)__android_log_print(level, TAG, __VA_ARGS__))
@@ -19,7 +20,7 @@ static int use_log_report = 0;
 #define LOGI(format, ...)  __android_log_print(ANDROID_LOG_INFO,  FF_LOG_TAG, format, ##__VA_ARGS__)
 
 
-// 原样输出FFmpeg日志
+/// 原样输出FFmpeg日志
 static void ffp_log_callback_brief(void *ptr, int level, const char *fmt, va_list vl) {
     int ffplv = FF_LOG_VERBOSE;
     if (level <= AV_LOG_ERROR)
@@ -37,7 +38,7 @@ static void ffp_log_callback_brief(void *ptr, int level, const char *fmt, va_lis
         VLOG(ffplv, FF_LOG_TAG, fmt, vl);
 }
 
-// 对FFmpeg日志进行格式化
+/// 对FFmpeg日志进行格式化
 static void ffp_log_callback_report(void *ptr, int level, const char *fmt, va_list vl) {
     int ffplv = FF_LOG_VERBOSE;
     if (level <= AV_LOG_ERROR)

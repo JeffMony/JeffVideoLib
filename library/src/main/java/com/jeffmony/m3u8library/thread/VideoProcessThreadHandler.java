@@ -3,8 +3,9 @@ package com.jeffmony.m3u8library.thread;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Process;
+import android.util.Log;
 
-import com.jeffmony.m3u8library.utils.LogUtils;
+import com.jeffmony.m3u8library.Constants;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
@@ -69,7 +70,7 @@ public class VideoProcessThreadHandler {
             long startTime = System.currentTimeMillis();
             super.run();
             long endTime = System.currentTimeMillis();
-            LogUtils.i(TAG, "MediaWorkerThread execution time: " + (endTime - startTime));
+            Log.i(Constants.TAG, "MediaWorkerThread execution time: " + (endTime - startTime));
         }
     }
 

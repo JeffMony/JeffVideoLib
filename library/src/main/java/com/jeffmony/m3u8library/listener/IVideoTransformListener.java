@@ -4,7 +4,7 @@ public interface IVideoTransformListener {
 
     void onTransformProgress(float progress);
 
-    void onTransformFailed(Exception e);
+    void onTransformFailed(int err);
 
     void onTransformFinished();
 }

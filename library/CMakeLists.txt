@@ -10,23 +10,29 @@ set(-DCMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -s -Wdeprecated-
 
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--exclude-libs,ALL -O3 -flto -Wl,--gc-sections")
 
-set(EXTRA_DIR ${CMAKE_CURRENT_LIST_DIR}/../../../../extra)
+set(EXTRA_DIR ${CMAKE_CURRENT_LIST_DIR}/../third_party)
 
 include_directories(${EXTRA_DIR}/output/ffmpeg/${ANDROID_ABI}/include)
 
-## libavcodec.so
+set(SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/src/main/cpp)
+
+include_directories(${SOURCE_DIR})
+
+include_directories(${EXTRA_DIR}/messagequeue)
+
+## libavcodec
 add_library(libavcodec STATIC IMPORTED)
 set_target_properties(libavcodec PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/output/ffmpeg/${ANDROID_ABI}/lib/libavcodec.a)
 
-## libavformat.so
+## libavformat
 add_library(libavformat STATIC IMPORTED)
 set_target_properties(libavformat PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/output/ffmpeg/${ANDROID_ABI}/lib/libavformat.a)
 
-## libavutil.so
+## libavutil
 add_library(libavutil STATIC IMPORTED)
 set_target_properties(libavutil PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/output/ffmpeg/${ANDROID_ABI}/lib/libavutil.a)
 
-## libswresample.so
+## libswresample
 add_library(libswresample STATIC IMPORTED)
 set_target_properties(libswresample PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/output/ffmpeg/${ANDROID_ABI}/lib/libswresample.a)
 
@@ -40,42 +46,27 @@ set_target_properties(libssl PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/output/op
 add_library(libcrypto STATIC IMPORTED)
 set_target_properties(libcrypto PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/output/openssl/${ANDROID_ABI}/lib/libcrypto.a)
 
-include_directories(.)
+add_library(libmessage_queue SHARED IMPORTED)
+set_target_properties(libmessage_queue PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_LIST_DIR}/src/main/nativeLibs/${ANDROID_ABI}/libmessage_queue.so)
 
-# Creates and names a library, sets it as either STATIC
-# or SHARED, and provides the relative paths to its source code.
-# You can define multiple libraries, and CMake builds them for you.
-# Gradle automatically packages shared libraries with your APK.
+file(
+        GLOB
+        muxer_source
+        ${SOURCE_DIR}/video_processor.cc
+        ${SOURCE_DIR}/media_env.c
+        ${SOURCE_DIR}/media_jni.cc
+)
 
-add_library( # Sets the name of the library.
+add_library(
         media_muxer
-
-        # Sets the library as a shared library.
         SHARED
+        ${muxer_source})
 
-        video_processor.cpp)
-
-# Searches for a specified prebuilt library and stores the path as a
-# variable. Because CMake includes system libraries in the search path by
-# default, you only need to specify the name of the public NDK library
-# you want to add. CMake verifies that the library exists before
-# completing its build.
-
-find_library( # Sets the name of the path variable.
-        log-lib
-
-        # Specifies the name of the NDK library that
-        # you want CMake to locate.
-        log)
-
-# Specifies libraries CMake should link to your target library. You
-# can link multiple libraries, such as libraries you define in this
-# build script, prebuilt third-party libraries, or system libraries.
-
-target_link_libraries( # Specifies the target library.
+target_link_libraries(
         media_muxer
         log
         z
+        libmessage_queue
         libavformat
         libavcodec
         libavutil
