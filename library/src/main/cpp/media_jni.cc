@@ -51,6 +51,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   jint video_process_result = env->RegisterNatives(video_process, videoProcessMethods, NELEM(videoProcessMethods));
   LOGE("%s %s %d video_process_result=%d", __FILE_NAME__, __func__ , __LINE__, (video_process_result == JNI_OK));
   env->DeleteLocalRef(video_process);
+  av_log_set_level(AV_LOG_INFO);
   av_log_set_callback(ffp_log_callback_report);
   return JNI_VERSION_1_6;
 }

@@ -50,6 +50,9 @@ static void ffp_log_callback_report(void *ptr, int level, const char *fmt, va_li
     else
         ffplv = FF_LOG_DEBUG;
 
+    if (level > AV_LOG_INFO) {
+      return;
+    }
     va_list vl2;
     char line[1024];
     static int print_prefix = 1;
