@@ -1,8 +1,6 @@
 #include <android/log.h>
 #include "libavutil/avutil.h"
 
-static int use_log_report = 0;
-
 #define FF_LOG_TAG     "Video_Merge"
 
 #define FF_LOG_VERBOSE        ANDROID_LOG_VERBOSE

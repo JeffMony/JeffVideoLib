@@ -18,7 +18,7 @@ set(SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/src/main/cpp)
 
 include_directories(${SOURCE_DIR})
 
-include_directories(${EXTRA_DIR}/messagequeue)
+include_directories(${EXTRA_DIR}/message_queue)
 
 ## libavcodec
 add_library(libavcodec STATIC IMPORTED)
@@ -36,7 +36,7 @@ set_target_properties(libavutil PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/output
 add_library(libswresample STATIC IMPORTED)
 set_target_properties(libswresample PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/output/ffmpeg/${ANDROID_ABI}/lib/libswresample.a)
 
-## libswscale.so
+## libswscale
 add_library(libswscale STATIC IMPORTED)
 set_target_properties(libswscale PROPERTIES IMPORTED_LOCATION ${EXTRA_DIR}/output/ffmpeg/${ANDROID_ABI}/lib/libswscale.a)
 

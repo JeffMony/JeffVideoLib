@@ -3,13 +3,17 @@
 //
 
 #include "video_processor.h"
-#include "android_log.h"
 #include "video_processor_message.h"
 #include "ffmpeg_options_const.h"
 
 extern "C" {
 #include "media_env.h"
+#include "android_log.h"
+#include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
+#include "libavutil/mem.h"
+#include "libavutil/mathematics.h"
+#include "libavutil/timestamp.h"
 }
 
 namespace media {
@@ -81,7 +85,7 @@ void VideoProcessor::TransformVideoInternal(const char *input_path, const char *
   }
   LOGI("%s %s %d output format=%s", __FILE_NAME__, __func__ , __LINE__, output_context->oformat->name);
   int stream_size = input_context->nb_streams;
-  int *streams = (int *) av_malloc(sizeof(int) * stream_size);
+  int *streams = (int *) av_malloc_array(stream_size, sizeof(*streams));
   int width;
   int height;
   int stream_index = 0;
