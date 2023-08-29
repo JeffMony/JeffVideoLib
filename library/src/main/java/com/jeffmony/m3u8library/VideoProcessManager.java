@@ -1,6 +1,7 @@
 package com.jeffmony.m3u8library;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 
 import com.jeffmony.m3u8library.listener.IVideoTransformListener;
@@ -11,7 +12,7 @@ public class VideoProcessManager {
 
     private static volatile VideoProcessManager sInstance = null;
     private static volatile boolean sLoadLibrary = false;
-    private static final Handler mMainHandler = new Handler();
+    private final Handler mMainHandler = new Handler(Looper.getMainLooper());
     private long mHandler = 0;
 
     private static void loadLibrary() {
@@ -39,7 +40,7 @@ public class VideoProcessManager {
         mHandler = createHandler();
     }
 
-    public void  transformM3U8ToMp4(final String inputPath, final String outputPath, final IVideoTransformListener listener) {
+    public void transformM3U8ToMp4(final String inputPath, final String outputPath, final IVideoTransformListener listener) {
         if (listener == null) {
             return;
         }
