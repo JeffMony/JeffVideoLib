@@ -56,6 +56,17 @@ public class VideoProcessManager {
         transformM3U8ToMp4(mHandler, inputPath, outputPath, listener);
     }
 
+    public void transformToMp4(final String config, final IVideoTransformListener listener) {
+        if (listener == null) {
+            return;
+        }
+        if (TextUtils.isEmpty(config)) {
+            listener.onTransformFailed(-1);
+            return;
+        }
+        transformToMp4(mHandler, config, listener);
+    }
+
     private void onTransformProgress(IVideoTransformListener listener, float progress) {
         if (listener == null) {
             return;
@@ -91,4 +102,5 @@ public class VideoProcessManager {
 
     private native long createHandler();
     private native void transformM3U8ToMp4(long handler, String inputPath, String outputPath, IVideoTransformListener listener);
+    private native void transformToMp4(long handler, String config, IVideoTransformListener listener);
 }

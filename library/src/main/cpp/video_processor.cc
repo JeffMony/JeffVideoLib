@@ -46,11 +46,24 @@ void VideoProcessor::TransformVideo(const char *input_path, const char *output_p
   handler_->SendMessage(msg);
 }
 
+void VideoProcessor::TransformVideo(const char *config, jobject listener) {
+  auto length = strlen(config) + 1;
+  auto input_config = new char[length];
+  snprintf(input_config, length, "%s%c", config, 0);
+  thread::Message *msg = new thread::Message();
+  msg->what = kTransformVideoConfig;
+  msg->obj1 = input_config;
+  msg->obj2 = listener;
+  handler_->SendMessage(msg);
+}
+
 void VideoProcessor::TransformVideoInternal(const char *input_path, const char *output_path, jobject listener) {
   /// 初始化的时候设置options,可以解决av_dict_set导致的NE问题
   AVDictionary *ffmpeg_options = NULL;
   av_dict_set(&ffmpeg_options, PROTOCOL_OPTION_KEY, PROTOCOL_OPTION_VALUE, 0);
   av_dict_set(&ffmpeg_options, FORMAT_EXTENSION_KEY, FORMAT_EXTENSION_VALUE, 0);
+  av_dict_set(&ffmpeg_options, "fflags", "discardcorrupt", 0);
+
   AVFormatContext *input_context = NULL;
   int ret = avformat_open_input(&input_context, input_path, 0, &ffmpeg_options);
   if (ret < 0) {
@@ -193,6 +206,10 @@ void VideoProcessor::TransformVideoInternal(const char *input_path, const char *
       break;
     }
     if (packet->flags & AV_PKT_FLAG_CORRUPT) {
+      if (input_context->flags & AVFMT_FLAG_DISCARD_CORRUPT) {
+        av_packet_unref(packet);
+        continue;
+      }
       av_packet_unref(packet);
       av_packet_free(&packet);
       avformat_close_input(&input_context);
@@ -307,6 +324,10 @@ void VideoProcessor::TransformVideoInternal(const char *input_path, const char *
   }
 }
 
+void VideoProcessor::TransformVideoInternal(const char *config, jobject listener) {
+
+}
+
 void VideoProcessor::CallOnTransformFailed(jobject listener, int err) {
   if (video_process_object_ == nullptr) {
     return;
@@ -371,6 +392,14 @@ void VideoProcessor::HandleMessage(thread::Message *msg) {
       TransformVideoInternal(input_path, output_path, listener);
       delete[] input_path;
       delete[] output_path;
+      break;
+    }
+
+    case VideoProcessorMessage::kTransformVideoConfig: {
+      auto config = reinterpret_cast<const char *>(msg->obj1);
+      auto listener = reinterpret_cast<jobject>(msg->obj2);
+      TransformVideoInternal(config, listener);
+      delete[] config;
       break;
     }
   }

@@ -19,6 +19,8 @@ namespace media {
 
   void TransformVideo(const char *input_path, const char *output_path, jobject listener);
 
+  void TransformVideo(const char *config, jobject listener);
+
  protected:
    void HandleMessage(thread::Message *msg) override;
 
@@ -26,6 +28,8 @@ namespace media {
 
  private:
    void TransformVideoInternal(const char *input_path, const char *output_path, jobject listener);
+
+   void TransformVideoInternal(const char *config, jobject listener);
 
  private:
    void CallOnTransformFailed(jobject listener, int err);

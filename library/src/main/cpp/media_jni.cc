@@ -36,9 +36,18 @@ void VIDEO_PROCESS_TRANSFORM_VIDEO(JNIEnv *env, jobject object, jlong id, jstrin
   env->ReleaseStringUTFChars(j_output_path, output_path);
 }
 
+void VIDEO_PROCESS_TRANSFORM_VIDEO_CONFIG(JNIEnv *env, jobject object, jlong id, jstring j_config, jobject j_listener) {
+  auto video_processor = reinterpret_cast<media::VideoProcessor *>(id);
+  auto config = env->GetStringUTFChars(j_config, JNI_FALSE);
+  jobject listener = env->NewGlobalRef(j_listener);
+  video_processor->TransformVideo(config, listener);
+  env->ReleaseStringUTFChars(j_config, config);
+}
+
 static JNINativeMethod videoProcessMethods[] = {
     { "createHandler", "()J", (void **) VIDEO_PROCESS_CREATE_HANDLER },
     { "transformM3U8ToMp4", "(JLjava/lang/String;Ljava/lang/String;Lcom/jeffmony/m3u8library/listener/IVideoTransformListener;)V", (void **) VIDEO_PROCESS_TRANSFORM_VIDEO },
+    {"transformToMp4", "(JLjava/lang/String;Lcom/jeffmony/m3u8library/listener/IVideoTransformListener;)V", (void **) VIDEO_PROCESS_TRANSFORM_VIDEO_CONFIG },
 };
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {

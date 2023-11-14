@@ -52,6 +52,7 @@ set_target_properties(libmessage_queue PROPERTIES IMPORTED_LOCATION ${CMAKE_CURR
 file(
         GLOB
         muxer_source
+        ${SOURCE_DIR}/video_merge.cc
         ${SOURCE_DIR}/video_processor.cc
         ${SOURCE_DIR}/media_env.c
         ${SOURCE_DIR}/media_jni.cc

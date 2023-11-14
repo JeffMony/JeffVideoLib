@@ -9,6 +9,7 @@ namespace media {
 
 enum VideoProcessorMessage {
   kTransformVideo = 100,
+  kTransformVideoConfig,
 };
 
 }
